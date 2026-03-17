@@ -7658,6 +7658,30 @@ impl EditorElement {
                 };
 
                 if phase == DispatchPhase::Bubble && hitbox.should_handle_scroll(window) {
+                    // Pixels delta is intentionally ignored to avoid jitter
+                    // when performing pinch-zoom gestures.
+                    if event.modifiers.secondary()
+                        && EditorSettings::get_global(cx).mouse_wheel_zoom.enabled
+                    {
+                        let adjustment = match event.delta {
+                            gpui::ScrollDelta::Lines(lines) => {
+                                if lines.y > 0.0 {
+                                    Some(px(1.0))
+                                } else if lines.y < 0.0 {
+                                    Some(px(-1.0))
+                                } else {
+                                    None
+                                }
+                            }
+                            gpui::ScrollDelta::Pixels(_) => None,
+                        };
+                        if let Some(adjustment) = adjustment {
+                            theme::adjust_buffer_font_size(cx, |size| size + adjustment);
+                            cx.stop_propagation();
+                            return;
+                        }
+                    }
+
                     delta = delta.coalesce(event.delta);
                     editor.update(cx, |editor, cx| {
                         let position_map: &PositionMap = &position_map;

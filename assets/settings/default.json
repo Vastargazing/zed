@@ -313,6 +313,11 @@
     // The delay in milliseconds that must elapse before drag and drop is allowed. Otherwise, a new text selection is created.
     "delay": 300,
   },
+  // Whether to change editor font size when scrolling with Ctrl (or Cmd on macOS) held.
+  "mouse_wheel_zoom": {
+    // When true, holding Ctrl/Cmd while scrolling changes the editor font size.
+    "enabled": false,
+  },
   // What to do when go to definition yields no results.
   //
   // 1. Do nothing: `none`

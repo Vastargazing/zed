@@ -60,7 +60,18 @@ pub struct EditorSettings {
     pub completion_menu_scrollbar: ShowScrollbar,
     pub completion_detail_alignment: CompletionDetailAlignment,
     pub diff_view_style: DiffViewStyle,
+    pub mouse_wheel_zoom: MouseWheelZoom,
 }
+
+/// Settings for zooming the editor font size with the mouse wheel.
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+pub struct MouseWheelZoom {
+    /// When true, holding Ctrl (or Cmd on macOS) while scrolling changes the editor font size.
+    ///
+    /// Default: false
+    pub enabled: bool,
+}
+
 #[derive(Debug, Clone)]
 pub struct Jupyter {
     /// Whether the Jupyter feature is enabled.
@@ -200,6 +211,8 @@ impl Settings for EditorSettings {
         let search = editor.search.unwrap();
         let drag_and_drop_selection = editor.drag_and_drop_selection.unwrap();
         let sticky_scroll = editor.sticky_scroll.unwrap();
+        let mouse_wheel_zoom = editor.mouse_wheel_zoom.unwrap();
+
         Self {
             cursor_blink: editor.cursor_blink.unwrap(),
             cursor_shape: editor.cursor_shape.map(Into::into),
@@ -297,6 +310,33 @@ impl Settings for EditorSettings {
             completion_menu_scrollbar: editor.completion_menu_scrollbar.map(Into::into).unwrap(),
             completion_detail_alignment: editor.completion_detail_alignment.unwrap(),
             diff_view_style: editor.diff_view_style.unwrap(),
+            mouse_wheel_zoom: MouseWheelZoom {
+                enabled: mouse_wheel_zoom.enabled.unwrap(),
+            },
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use gpui::TestAppContext;
+    use settings::SettingsStore;
+
+    #[gpui::test]
+    fn test_mouse_wheel_zoom_default_is_disabled(cx: &mut TestAppContext) {
+        cx.update(|cx| {
+            let store = SettingsStore::test(cx);
+            cx.set_global(store);
+            crate::init(cx);
+        });
+
+        cx.read(|cx| {
+            let settings = EditorSettings::get_global(cx);
+            assert!(
+                !settings.mouse_wheel_zoom.enabled,
+                "mouse_wheel_zoom should be disabled by default"
+            );
+        });
     }
 }

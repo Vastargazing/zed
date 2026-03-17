@@ -226,6 +226,9 @@ pub struct EditorSettingsContent {
     ///
     /// Default: split
     pub diff_view_style: Option<DiffViewStyle>,
+
+    /// Whether to change editor font size when scrolling with Ctrl/Cmd held.
+    pub mouse_wheel_zoom: Option<MouseWheelZoomContent>,
 }
 
 #[derive(
@@ -858,6 +861,16 @@ pub struct DragAndDropSelectionContent {
     ///
     /// Default: 300
     pub delay: Option<DelayMs>,
+}
+
+/// Whether to change font size with Ctrl/Cmd + mouse wheel scroll.
+#[with_fallible_options]
+#[derive(Clone, Default, Debug, Serialize, Deserialize, JsonSchema, MergeFrom, PartialEq, Eq)]
+pub struct MouseWheelZoomContent {
+    /// When true, holding Ctrl (or Cmd on macOS) while scrolling changes the editor font size.
+    ///
+    /// Default: false
+    pub enabled: Option<bool>,
 }
 
 /// When to show the minimap in the editor.
